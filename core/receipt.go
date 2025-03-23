@@ -5,6 +5,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 	"unicode"
 
 	"github.com/go-playground/validator/v10"
@@ -12,8 +13,8 @@ import (
 
 type Receipt struct {
 	Retailer     string `json:"retailer" binding:"required"`
-	PurchaseDate string `json:"purchaseDate" binding:"required" time_format:"2006-01-02"`
-	PurchaseTime string `json:"purchaseTime" binding:"required" time_format:"15:04"`
+	PurchaseDate string `json:"purchaseDate" binding:"required,validateDate"`
+	PurchaseTime string `json:"purchaseTime" binding:"required,validateTime"`
 	Items        []Item `json:"items" binding:"required,min=1,dive"`
 	Total        string `json:"total" binding:"required,validatePrice"`
 }
@@ -42,6 +43,25 @@ func ValidatePrice(fl validator.FieldLevel) bool {
 	return re.MatchString(price)
 }
 
+// Custom validator for PurcahseDate field
+func ValidateDate(fl validator.FieldLevel) bool {
+	date := fl.Field().String()
+	re := regexp.MustCompile(`^\d{4}-\d{2}-\d{2}$`)
+	validString := re.MatchString(date)
+	_, er := time.Parse("2006-01-02", date)
+	return validString && er == nil
+}
+
+// Custom vlalidator for PurchaseTime field
+func ValidateTime(fl validator.FieldLevel) bool {
+	timeField := fl.Field().String()
+	re := regexp.MustCompile(`^\d{2}:\d{2}$`)
+	validString := re.MatchString(timeField)
+	_, er := time.Parse("15:04", timeField)
+	return validString && er == nil
+}
+
+// Function to calcualte points for receipt per challenge requirements
 func CalculatePoints(receipt Receipt) int {
 	var points = 0
 	retailerSplit := strings.SplitSeq(receipt.Retailer, " ")

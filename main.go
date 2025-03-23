@@ -40,6 +40,8 @@ func handleNewReceipt(c *gin.Context) {
 
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		v.RegisterValidation("validatePrice", core.ValidatePrice)
+		v.RegisterValidation("validateDate", core.ValidateDate)
+		v.RegisterValidation("validateTime", core.ValidateTime)
 	}
 
 	if err := c.BindJSON(&newReceipt); err != nil {
