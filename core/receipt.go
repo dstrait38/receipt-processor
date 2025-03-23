@@ -52,7 +52,7 @@ func ValidateDate(fl validator.FieldLevel) bool {
 	return validString && er == nil
 }
 
-// Custom vlalidator for PurchaseTime field
+// Custom validator for PurchaseTime field
 func ValidateTime(fl validator.FieldLevel) bool {
 	timeField := fl.Field().String()
 	re := regexp.MustCompile(`^\d{2}:\d{2}$`)
